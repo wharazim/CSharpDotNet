@@ -1,0 +1,55 @@
+﻿@using MvcPartialViews.Models
+@model MvcPartialViews.ViewModels.BigBadVoodooViewModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div>&nbsp;</div>
+<div class="container">
+    <div class="form-group">
+        <div class="row">
+            <div class="col-md-4">
+                Add a new Residence
+                <div>
+                    @{Html.RenderPartial("Residence/Create", new Residence { });}
+                    <button id="btnAddAddress" class="btn btn-default">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>&nbsp;</div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-md-4">
+                List of Added Residences
+                <div>
+                    @{Html.RenderPartial("Residence/List", new List<Residence> { });}
+                </div>
+            </div>
+        </div>
+        <div>&nbsp;</div>
+        <div class="row">
+            <div>
+                <button id="btnSubmitForm" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script>
+        $(document).ready(() => {
+            $("#btnAddAddress").click((e) => {
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/AddResidence",
+                    data: {},
+                    contentType: ""
+                });
+            });
+
+            $("#btnSubmitForm").click((e) => {
+                alert("Form Submit!");
+            });
+        });
+    </script>
+}
