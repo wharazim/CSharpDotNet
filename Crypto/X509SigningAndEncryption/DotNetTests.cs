@@ -99,14 +99,24 @@ namespace DotNet.EncryptionTests
     [TestClass]
     public class DotNetTests
     {
+        public const string TEST_PATH = @"C:\Users\Public\Repos\X509SigningAndEncryption_Tests";
+
+        public DotNetTests()
+        {
+            if (!Directory.Exists(TEST_PATH))
+            {
+                Directory.CreateDirectory(TEST_PATH);
+            }
+        }
+
         [TestMethod]
         public void EncryptTest_encrypt_with_public_and_private()
         {
             // Set up 
             var input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             var enc = new EncryptionClass();
-            var publicKey = File.ReadAllText("public.pem");
-            var privateKey = File.ReadAllText("private.key");
+            var publicKey = File.ReadAllText(Path.Combine(TEST_PATH, "public.pem"));
+            var privateKey = File.ReadAllText(Path.Combine(TEST_PATH, "private.key"));
 
             // Encrypt it
             var encryptedWithPublic = enc.RsaEncryptWithPublic(input, publicKey);
@@ -125,7 +135,7 @@ namespace DotNet.EncryptionTests
         [TestMethod]
         public void Jwt_sign_with_hs256_private_key_verify_with_public_key()
         {
-            string key = "secretsecretsecret";
+            string key = "secretsecretsecretsecretsecretsecret";
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, "HS256");
@@ -156,11 +166,11 @@ namespace DotNet.EncryptionTests
 
             var sb = new StringBuilder();
             PEMExporter.ExportKey(csp, new StringWriter(sb), true);
-            File.WriteAllText("private.key", sb.ToString());
+            File.WriteAllText(Path.Combine(TEST_PATH, "private.key"), sb.ToString());
 
             sb.Clear();
             PEMExporter.ExportKey(csp, new StringWriter(sb), false);
-            File.WriteAllText("public.pem", sb.ToString());
+            File.WriteAllText(Path.Combine(TEST_PATH, "public.pem"), sb.ToString());
         }
 
         private void RSABlobToPem(RSACryptoServiceProvider csp, string fileName, bool includePrivate)
@@ -180,23 +190,23 @@ namespace DotNet.EncryptionTests
         [TestMethod]
         public void RSA_bytes_to_pem()
         {
-            var bytes = File.ReadAllBytes("private.pvk");
+            var bytes = File.ReadAllBytes(Path.Combine(TEST_PATH, "test.pvk"));
             var csp = new RSACryptoServiceProvider();
             csp.ImportCspBlob(bytes);
 
-            RSABlobToPem(csp, "private.key", true);
-            RSABlobToPem(csp, "public.pem", false);
+            RSABlobToPem(csp, Path.Combine(TEST_PATH, "private.key"), true);
+            RSABlobToPem(csp, Path.Combine(TEST_PATH, "public.pem"), false);
         }
 
         [TestMethod]
         public void RSA_blob_to_pem()
         {
-            var bytes = Convert.FromBase64String(File.ReadAllText(@"C:\Temp\private.blob"));
+            var bytes = Convert.FromBase64String(File.ReadAllText(Path.Combine(TEST_PATH, "private.blob")));
             var csp = new RSACryptoServiceProvider();
             csp.ImportCspBlob(bytes);
 
-            RSABlobToPem(csp, @"C:\Temp\private.key", true);
-            RSABlobToPem(csp, @"C:\Temp\public.pem", false);
+            RSABlobToPem(csp, Path.Combine(TEST_PATH, "private.key"), true);
+            RSABlobToPem(csp, Path.Combine(TEST_PATH, "public.pem"), false);
         }
 
         [DataContract]
@@ -237,7 +247,7 @@ namespace DotNet.EncryptionTests
         [TestMethod]
         public void RSA_public_blob_to_jwk()
         {
-            var bytes = Convert.FromBase64String(File.ReadAllText(@"C:\Temp\public.blob"));
+            var bytes = Convert.FromBase64String(File.ReadAllText(Path.Combine(TEST_PATH, "public.blob")));
             var csp = new RSACryptoServiceProvider();
             csp.ImportCspBlob(bytes);
 
@@ -267,7 +277,7 @@ namespace DotNet.EncryptionTests
                 Modulus = Convert.FromBase64String(jwk.Modulus)
             });
             bytes = csp.ExportCspBlob(false);
-            File.WriteAllText(@"C:\Temp\public.from_jwk.blob", Convert.ToBase64String(bytes));
+            File.WriteAllText(Path.Combine(TEST_PATH, "public.from_jwk.blob"), Convert.ToBase64String(bytes));
         }
 
         [TestMethod]
@@ -276,16 +286,16 @@ namespace DotNet.EncryptionTests
             var csp = new RSACryptoServiceProvider(2048);
 
             var bytes = csp.ExportCspBlob(true);
-            File.WriteAllText(@"C:\Temp\private.blob", Convert.ToBase64String(bytes));
+            File.WriteAllText(Path.Combine(TEST_PATH, "private.blob"), Convert.ToBase64String(bytes));
 
             bytes = csp.ExportCspBlob(false);
-            File.WriteAllText(@"C:\Temp\public.blob", Convert.ToBase64String(bytes));
+            File.WriteAllText(Path.Combine(TEST_PATH, "public.blob"), Convert.ToBase64String(bytes));
         }
 
         [TestMethod]
         public void Jwt_sign_with_rs256_private_key_verify_with_public_key()
         {
-            var bytes = Convert.FromBase64String(File.ReadAllText("private.blob"));
+            var bytes = Convert.FromBase64String(File.ReadAllText(Path.Combine(TEST_PATH, "private.blob")));
             var csp = new RSACryptoServiceProvider();
             csp.ImportCspBlob(bytes);
 
@@ -318,7 +328,7 @@ namespace DotNet.EncryptionTests
         [TestMethod]
         public void X509_read_cer_from_file()
         {
-            var bytes = File.ReadAllBytes("test.cer");
+            var bytes = File.ReadAllBytes(Path.Combine(TEST_PATH, "test.cer"));
             var x509 = new X509Certificate2();
             x509.Import(bytes);
 
@@ -350,13 +360,13 @@ namespace DotNet.EncryptionTests
         [TestMethod]
         public void X509_export_public_key_pem_from_cer_file()
         {
-            var bytes = File.ReadAllBytes("test.cer");
+            var bytes = File.ReadAllBytes(Path.Combine(TEST_PATH, "test.cer"));
             var x509 = new X509Certificate2();
             x509.Import(bytes);
 
             var csp = new RSACryptoServiceProvider();
             csp.ImportParameters(x509.GetRSAPublicKey().ExportParameters(false));
-            RSABlobToPem(csp, "test.pem", false);
+            RSABlobToPem(csp, Path.Combine(TEST_PATH, "test.pem"), false);
         }
 
         [TestMethod]
@@ -365,12 +375,13 @@ namespace DotNet.EncryptionTests
             var store = new X509Store();
             store.Open(OpenFlags.OpenExistingOnly);
 
-            var collection = store.Certificates.Find(X509FindType.FindByThumbprint, "f1eb51a85c65409da75e756ed29d8990e4e5e2ff", false);
+            //var collection = store.Certificates.Find(X509FindType.FindByThumbprint, "1de461700c77f33befb880d967f5a8dbfd8fa412", false);
+            var collection = store.Certificates.Find(X509FindType.FindByIssuerName, "localhost", false);
             var x509 = collection[0];
 
             var csp = new RSACryptoServiceProvider();
             csp.ImportParameters(x509.GetRSAPublicKey().ExportParameters(false));
-            RSABlobToPem(csp, "x509.rsa_public.pem", false);
+            RSABlobToPem(csp, Path.Combine(TEST_PATH, "x509.rsa_public.pem"), false);
         }
 
         [TestMethod]
@@ -379,7 +390,8 @@ namespace DotNet.EncryptionTests
             var store = new X509Store();
             store.Open(OpenFlags.OpenExistingOnly);
 
-            var collection = store.Certificates.Find(X509FindType.FindByThumbprint, "6d1b6273ab43f29a80064d139099c839b0600f8e", false);
+            //var collection = store.Certificates.Find(X509FindType.FindByThumbprint, "1de461700c77f33befb880d967f5a8dbfd8fa412", false);
+            var collection = store.Certificates.Find(X509FindType.FindByIssuerName, "localhost", false);
             var x509 = collection[0];
 
             var securityKey = new RsaSecurityKey(x509.GetRSAPrivateKey());

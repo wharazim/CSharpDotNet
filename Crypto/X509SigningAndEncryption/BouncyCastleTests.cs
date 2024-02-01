@@ -88,6 +88,16 @@ namespace BouncyCastle.EncryptionTests
     [TestClass]
     public class BouncyCastleTests
     {
+        public const string TEST_PATH = @"C:\Users\Public\Repos\X509SigningAndEncryption_Tests";
+
+        public BouncyCastleTests()
+        {
+            if (!Directory.Exists(TEST_PATH))
+            {
+                Directory.CreateDirectory(TEST_PATH);
+            }
+        }
+
         [TestMethod]
         public void Encrypt_compare_public_pem_w_public_extracted_from_private()
         {
@@ -95,8 +105,8 @@ namespace BouncyCastle.EncryptionTests
             AsymmetricKeyParameter keyParameterFromPriv;
             AsymmetricCipherKeyPair keyPair;
 
-            var publicKey = File.ReadAllText(@"C:\Temp/public.pem");
-            var privateKey = File.ReadAllText(@"C:\Temp\private.key");
+            var publicKey = File.ReadAllText(Path.Combine(TEST_PATH, "public.pem"));
+            var privateKey = File.ReadAllText(Path.Combine(TEST_PATH, "private.key"));
 
             using (var txtreader = new StringReader(publicKey))
             {
@@ -118,8 +128,8 @@ namespace BouncyCastle.EncryptionTests
             // Set up 
             var input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             var enc = new EncryptionClass();
-            var publicKey = File.ReadAllText(@"C:\Temp/public.pem");
-            var privateKey = File.ReadAllText(@"C:\Temp\private.key");
+            var publicKey = File.ReadAllText(Path.Combine(TEST_PATH, "public.pem"));
+            var privateKey = File.ReadAllText(Path.Combine(TEST_PATH, "private.key"));
 
             // Encrypt it
             var encryptedWithPublic = enc.RsaEncryptWithPublic(input, publicKey);

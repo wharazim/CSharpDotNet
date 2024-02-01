@@ -1,0 +1,36 @@
+<Playlist Version="2.0">
+  <Rule Name="Includes" Match="Any">
+    <Rule Match="All">
+      <Property Name="Solution" />
+      <Rule Match="Any">
+        <Rule Match="All">
+          <Property Name="Project" Value="X509SigningAndEncryption" />
+          <Rule Match="Any">
+            <Rule Match="All">
+              <Property Name="Namespace" Value="DotNet.EncryptionTests" />
+              <Rule Match="Any">
+                <Rule Match="All">
+                  <Property Name="Class" Value="DotNetTests" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="DotNet.EncryptionTests.DotNetTests.RSA_create_new_keypair_as_pem" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="RSA_create_new_keypair_as_pem" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="DotNet.EncryptionTests.DotNetTests.EncryptTest_encrypt_with_public_and_private" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="EncryptTest_encrypt_with_public_and_private" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+              </Rule>
+            </Rule>
+          </Rule>
+        </Rule>
+      </Rule>
+    </Rule>
+  </Rule>
+</Playlist>
